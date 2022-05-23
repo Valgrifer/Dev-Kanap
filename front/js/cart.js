@@ -129,6 +129,12 @@
         let basket = getBasket();
         let error = false;
 
+        if(basket.length < 1)
+        {
+            alert("Panier vide");
+            return;
+        }
+
         let data = {
             contact: {},
             products: []
