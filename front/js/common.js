@@ -25,3 +25,10 @@ function requestApi(callback, path = "/", method = 'GET')
             console.error(error);
         });
 }
+
+function getParams(key)
+{
+    let str = document.location.href;
+    let url = new window.URL(str);
+    return url.searchParams.get(key);
+}
