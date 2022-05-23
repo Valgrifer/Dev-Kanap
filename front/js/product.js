@@ -30,7 +30,7 @@
         if(data === undefined)
             return;
 
-        let basket = JSON.parse(window.localStorage.getItem("basket") || "[]");
+        let basket = getBasket();
 
         let thisArticle = dataToArticle();
         thisArticle.color = getEl("select#color-select").value;
@@ -46,6 +46,7 @@
             {
                 basket[x].count += thisArticle.count;
                 added = true;
+                break;
             }
 
         if(!added)

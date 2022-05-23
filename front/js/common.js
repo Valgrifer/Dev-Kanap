@@ -35,3 +35,8 @@ function getParams(key)
 
 function getEl(query)
 { return document.querySelector(query); }
+
+function getBasket()
+{
+    return JSON.parse(window.localStorage.getItem("basket") || "[]");
+}
