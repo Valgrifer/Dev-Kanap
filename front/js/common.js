@@ -1,16 +1,20 @@
-const URL = "http://localhost:3000/api/products";
+const REQUEST_URL = "http://localhost:3000/api/products";
 
-function requestApi(callback, path = "/", method = 'GET')
+function requestApi(callback, path = "/", method = 'GET', body, headers)
 {
     let params = {
         method: method,
     };
 
-    const request = new Request(URL + path, params);
+    if(body !== undefined)
+        params.body = body;
 
-    fetch(request, params)
+    if(headers !== undefined)
+        params.headers = headers;
+
+    fetch(REQUEST_URL + path, params)
         .then(response => {
-            if (response.status === 200) {
+            if (response.status === 200 || response.status === 201) {
                 return response.json();
             } else {
                 throw new Error('Something went wrong on api server!');
@@ -29,7 +33,7 @@ function requestApi(callback, path = "/", method = 'GET')
 function getParams(key)
 {
     let str = document.location.href;
-    let url = new window.URL(str);
+    let url = new URL(str);
     return url.searchParams.get(key);
 }
 

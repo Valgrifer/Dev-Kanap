@@ -102,4 +102,34 @@
         document.querySelectorAll("input.itemQuantity").forEach(el => el.onchange = onchange);
         document.querySelectorAll("p.deleteItem").forEach(el => el.onclick = ondelete);
     });
+
+    getEl("form.cart__order__form").onsubmit = event => {
+        event.preventDefault();
+
+        let basket = getBasket();
+
+        let data = {
+            contact: {},
+            products: []
+        }
+
+        event.target.querySelectorAll("input").forEach(el => {
+            if(el.name)
+                data.contact[el.name] = el.value
+        });
+
+
+        for (const article of basket)
+            data.products.push(article.id);
+
+        requestApi(response => {
+            if(!response.orderId)
+                return;
+
+            window.localStorage.setItem("basket", "[]");
+            document.location = "./confirmation.html?orderId=" + response.orderId;
+        }, "/order/", "POST", JSON.stringify(data), {
+            'Content-Type': 'application/json'
+        });
+    };
 })()
