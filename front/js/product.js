@@ -2,13 +2,10 @@
     let id = getParams("id");
     let data = undefined;
 
-    function getEl(query)
-    { return document.querySelector(query); }
-
     function dataToArticle()
     {
         return {
-            name: data["name"],
+            id: data["_id"],
             count: 0,
             color: null,
         };
@@ -45,7 +42,7 @@
         let added = false;
 
         for (const x in basket)
-            if(basket[x].name === thisArticle.name && basket[x].color === thisArticle.color)
+            if(basket[x].id === thisArticle.id && basket[x].color === thisArticle.color)
             {
                 basket[x].count += thisArticle.count;
                 added = true;

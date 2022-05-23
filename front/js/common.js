@@ -32,3 +32,6 @@ function getParams(key)
     let url = new window.URL(str);
     return url.searchParams.get(key);
 }
+
+function getEl(query)
+{ return document.querySelector(query); }
