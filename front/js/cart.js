@@ -11,7 +11,6 @@
         let article = getArticle(event.target);
         let id = article.dataset.id;
         let color = article.dataset.color;
-        let price = parseInt(article.querySelector("span.price").innerHTML);
 
         let newvalue = parseInt(event.target.value);
 
@@ -60,8 +59,6 @@
     requestApi(response => {
         let basket = getBasket();
 
-        console.log(basket);
-
         let totalCount = 0;
         let totalPrice2 = 0;
         let content = "";
@@ -103,10 +100,34 @@
         document.querySelectorAll("p.deleteItem").forEach(el => el.onclick = ondelete);
     });
 
+
+    const regextable = {
+        firstName: {
+            regex: /^[a-zA-Z]+$/,
+            message: "Ceci n'est pas un prénom valide"
+        },
+        lastName: {
+            regex: /^[a-zA-Z ]+$/,
+            message: "Ceci n'est pas un nom valide"
+        },
+        address: {
+            regex: /^[a-zA-Z0-9\s,'-]*$/,
+            message: "Ceci n'est pas une adresse valide"
+        },
+        city: {
+            regex: /^[\w ]+$/,
+            message: "Ceci n'est pas une ville valide"
+        },
+        email: {
+            regex: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+            message: "Ceci n'est pas un email valide"
+        },
+    };
     getEl("form.cart__order__form").onsubmit = event => {
         event.preventDefault();
 
         let basket = getBasket();
+        let error = false;
 
         let data = {
             contact: {},
@@ -114,10 +135,31 @@
         }
 
         event.target.querySelectorAll("input").forEach(el => {
-            if(el.name)
-                data.contact[el.name] = el.value
+            let table;
+            if(!el.name || !(table = regextable[el.name]))
+                return;
+
+            let errorEl = event.target.querySelector("p#" + el.name + "ErrorMsg")
+
+            console.log(el.name, el.value, table, table.regex.test(el.value));
+            if(table.regex.test(el.value))
+            {
+                data.contact[el.name] = el.value;
+
+                if(errorEl.innerHTML !== "")
+                    errorEl.innerHTML = "";
+            }
+            else
+            {
+                error = true;
+
+                if (errorEl.innerHTML !== table.message)
+                    errorEl.innerHTML = table.message;
+            }
         });
 
+        if(error)
+            return;
 
         for (const article of basket)
             data.products.push(article.id);
@@ -130,6 +172,8 @@
             document.location = "./confirmation.html?orderId=" + response.orderId;
         }, "/order/", "POST", JSON.stringify(data), {
             'Content-Type': 'application/json'
+        }, () => {
+            alert("Erreur dans la commande, formulaire incomplet?");
         });
     };
 })()
