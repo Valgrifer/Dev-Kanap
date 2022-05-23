@@ -10,6 +10,6 @@
             </article>
           </a>`;
 
-        document.querySelector("section#items").innerHTML = content;
+        getEl("section#items").innerHTML = content;
     });
 })()
