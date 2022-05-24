@@ -1,6 +1,6 @@
-const REQUEST_URL = "http://localhost:3000/api/products";
+const REQUEST_URL = "http://valgrifer.fr:3000/api/products";
 
-function requestApi(callback, path = "/", method = 'GET', body, headers)
+function requestApi(path = "/", method = 'GET', body, headers)
 {
     let params = {
         method: method,
@@ -12,7 +12,7 @@ function requestApi(callback, path = "/", method = 'GET', body, headers)
     if(headers !== undefined)
         params.headers = headers;
 
-    fetch(REQUEST_URL + path, params)
+    return fetch(REQUEST_URL + path, params)
         .then(response => {
             if (response.status === 200 || response.status === 201) {
                 return response.json();
@@ -20,14 +20,6 @@ function requestApi(callback, path = "/", method = 'GET', body, headers)
                 throw new Error('Something went wrong on api server!');
             }
         })
-        .then(response => {
-            console.log(response);
-            if(callback)
-                callback(response);
-        })
-        .catch(error => {
-            console.error(error);
-        });
 }
 
 function getParams(key)
@@ -42,5 +34,6 @@ function getEl(query)
 
 function getBasket()
 {
-    return JSON.parse(window.localStorage.getItem("basket") || "[]");
+    return JSON.parse(window.localStorage.getItem("basket")) ?? [];
 }
+export { REQUEST_URL, requestApi, getParams, getEl, getBasket }

@@ -1,59 +1,68 @@
-(() => {
-    let id = getParams("id");
-    let data = undefined;
+import {getBasket, getEl, getParams, requestApi} from "./common.js";
 
-    function dataToArticle()
+let id = getParams("id");
+
+function dataToArticle(product)
+{
+    return {
+        id: product["_id"],
+        count: 0,
+        color: null,
+    };
+}
+
+function displayData(product)
+{
+    getEl("title").textContent = product.name;
+    getEl("article div.item__img").innerHTML = `<img src="${product.imageUrl}" alt="${product.altTxt}">`;
+    getEl("h1#title").textContent = product.name;
+    getEl("span#price").textContent = product.price;
+    getEl("p#description").textContent = product.description;
+
+    let select = getEl("select#color-select");
+    for (const color of product.colors)
     {
-        return {
-            id: data["_id"],
-            count: 0,
-            color: null,
-        };
+        let option = document.createElement("option");
+        option.text = color;
+        select.add(option);
     }
+}
 
-    requestApi(response => {
-        data = response;
-
-        getEl("title").innerHTML = response["name"];
-        getEl("article div.item__img").innerHTML = `<img src="${response["imageUrl"]}" alt="${response["altTxt"]}">`;
-        getEl("h1#title").innerHTML = response["name"];
-        getEl("span#price").innerHTML = response["price"];
-        getEl("p#description").innerHTML = response["description"];
-
-        let options = "";
-        for (const color of response["colors"])
-            options += `<option value="${color}">${color}</option>`;
-        getEl("select#color-select").innerHTML = options;
-    }, `/${id}/`);
-
-    getEl("button#addToCart").onclick = event => {
-        if(data === undefined)
-            return;
-
+function addArticle(article)
+{
+    return () => {
         let basket = getBasket();
 
-        let thisArticle = dataToArticle();
-        thisArticle.color = getEl("select#color-select").value;
-        thisArticle.count = parseInt(getEl("input#itemQuantity").value);
+        article.color = getEl("select#color-select").value;
+        article.count = parseInt(getEl("input#itemQuantity").value);
 
-        if(thisArticle.count < 1)
+        if(article.count < 1)
             return;
 
         let added = false;
 
         for (const x in basket)
-            if(basket[x].id === thisArticle.id && basket[x].color === thisArticle.color)
+            if(basket[x].id === article.id && basket[x].color === article.color)
             {
-                basket[x].count += thisArticle.count;
+                basket[x].count += article.count;
                 added = true;
                 break;
             }
 
         if(!added)
-            basket.push(thisArticle);
+            basket.push(article);
 
         window.localStorage.setItem("basket", JSON.stringify(basket));
 
         document.location = "./cart.html";
-    };
-})()
+    }
+}
+
+requestApi(`/${id}/`)
+    .then(product => {
+        displayData(product);
+
+        let article = dataToArticle(product);
+
+        getEl("button#addToCart").onclick = addArticle(article);
+    });
