@@ -48,39 +48,11 @@ requestApi().then(products => {
     getEl("section#cart__items").innerHTML = content;
 
 
-    getEl("section#cart__items").onchange = event => {
-        let article = event.target.closest("article");
-        let id = article.dataset.id;
-        let color = article.dataset.color;
-
-        let newvalue = parseInt(event.target.value);
-
-        let basket = getBasket();
-
-        for (const x in basket)
-            if(basket[x].id === id && basket[x].color === color)
-            {
-                basket[x].count = newvalue;
-                break;
-            }
-
-        window.localStorage.setItem("basket", JSON.stringify(basket));
-
-        let totalCount = 0;
-        let totalPrice2 = 0;
-        for (const art of basket)
-        {
-            totalCount += art.count;
-            totalPrice2 += art.count * parseInt(getEl(`article[data-id="${art.id}"] span.price`).innerText);
-        }
-
-        totalQuantity.innerText = totalCount;
-        totalPrice.innerText = totalPrice2;
-    };
-    document.querySelectorAll("p.deleteItem").forEach(el => el.onclick = ondelete);
+    getEl("section#cart__items").onchange = quantityChangeEvent;
+    document.querySelectorAll("p.deleteItem").forEach(el => el.onclick = productDeleteEvent);
 });
 
-const ondelete = event => {
+const productDeleteEvent = event => {
     let article = event.target.closest("article");
     let id = article.dataset.id;
     let color = article.dataset.color;
@@ -99,21 +71,51 @@ const ondelete = event => {
     window.localStorage.setItem("basket", JSON.stringify(basket));
 };
 
+const quantityChangeEvent = event => {
+    let article = event.target.closest("article");
+    let id = article.dataset.id;
+    let color = article.dataset.color;
+
+    let newvalue = parseInt(event.target.value);
+
+    let basket = getBasket();
+
+    for (const x in basket)
+        if(basket[x].id === id && basket[x].color === color)
+        {
+            basket[x].count = newvalue;
+            break;
+        }
+
+    window.localStorage.setItem("basket", JSON.stringify(basket));
+
+    let totalCount = 0;
+    let totalPrice2 = 0;
+    for (const art of basket)
+    {
+        totalCount += art.count;
+        totalPrice2 += art.count * parseInt(getEl(`article[data-id="${art.id}"] span.price`).innerText);
+    }
+
+    totalQuantity.innerText = totalCount;
+    totalPrice.innerText = totalPrice2;
+}
+
 const regextable = {
     firstName: {
-        regex: /^[a-zA-Z]+$/,
+        regex: /^[a-zA-Zéèêëàâäîïôöûüùç\- ]{2,}$/,
         message: "Ceci n'est pas un prénom valide"
     },
     lastName: {
-        regex: /^[a-zA-Z ]+$/,
+        regex: /^[a-zA-Zéèêëàâäîïôöûüùç\- ]{2,}$/,
         message: "Ceci n'est pas un nom valide"
     },
     address: {
-        regex: /^[a-zA-Z0-9\s,'-]*$/,
+        regex: /^[0-9]{1,3}(?:(:[,. ]){1}[-a-zA-Zàâäéèêëïîôöùûüç]+)+/,
         message: "Ceci n'est pas une adresse valide"
     },
     city: {
-        regex: /^[\w ]+$/,
+        regex: /^[a-zA-Zéèêëàâäîïôöûüùç\- ]{2,}$/,
         message: "Ceci n'est pas une ville valide"
     },
     email: {
@@ -138,29 +140,29 @@ getEl("form.cart__order__form").onsubmit = event => {
         products: []
     }
 
-    event.target.querySelectorAll("input").forEach(el => {
-        let table;
-        if(!el.name || !(table = regextable[el.name]))
+    for (const x in regextable) {
+        let input = event.target.elements[x];
+        let table = regextable[x];
+        if(!input.name)
             return;
 
-        let errorEl = event.target.querySelector("p#" + el.name + "ErrorMsg")
+        let errorEl = event.target.querySelector("p#" + x + "ErrorMsg")
 
-        console.log(el.name, el.value, table, table.regex.test(el.value));
-        if(table.regex.test(el.value))
+        if(table.regex.test(input.value))
         {
-            data.contact[el.name] = el.value;
+            data.contact[input.name] = input.value;
 
-            if(errorEl.innerHTML !== "")
-                errorEl.innerHTML = "";
+            if(errorEl.innerText !== "")
+                errorEl.innerText = "";
         }
         else
         {
             error = true;
 
-            if (errorEl.innerHTML !== table.message)
-                errorEl.innerHTML = table.message;
+            if (errorEl.innerText !== table.message)
+                errorEl.innerText = table.message;
         }
-    });
+    }
 
     if(error)
         return;
