@@ -111,7 +111,7 @@ const regextable = {
         message: "Ceci n'est pas un nom valide"
     },
     address: {
-        regex: /^[0-9]{1,3}(?:(:[,. ]){1}[-a-zA-Zàâäéèêëïîôöùûüç]+)+/,
+        regex: /^[0-9]{1,3}(?:([,. ]){1}[-a-zA-Zàâäéèêëïîôöùûüç]+)+/,
         message: "Ceci n'est pas une adresse valide"
     },
     city: {
